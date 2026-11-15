@@ -1,0 +1,43 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Hub {
+  id        Int             @id @default(autoincrement())
+  name      String          @unique
+  latitude  Float?
+  longitude Float?
+  outgoing  BusConnection[] @relation("OriginHub")
+  incoming  BusConnection[] @relation("DestinationHub")
+  createdAt DateTime        @default(now())
+}
+
+model Bus {
+  id          Int             @id @default(autoincrement())
+  busNumber   String          @unique
+  connections BusConnection[]
+  createdAt   DateTime        @default(now())
+}
+
+model BusConnection {
+  id         Int      @id @default(autoincrement())
+  busId      Int
+  fromHubId  Int
+  toHubId    Int
+  distanceKm Float
+
+  bus         Bus @relation(fields: [busId], references: [id])
+  fromHub     Hub @relation("OriginHub", fields: [fromHubId], references: [id])
+  toHub       Hub @relation("DestinationHub", fields: [toHubId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([fromHubId])
+  @@index([toHubId])
+}
