@@ -81,3 +81,27 @@ export async function POST(request) {
     );
   }
 }
+
+export async function GET() {
+  try {
+    const hubs = await prisma.hub.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
+
+    return NextResponse.json({ hubs });
+
+  } catch (error) {
+    console.error("HUB FETCH ERROR:", error);
+
+    return NextResponse.json(
+      { error: "Failed to retrieve hubs." },
+      { status: 500 }
+    );
+  }
+}
